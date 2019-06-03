@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<project name="DemoD3D" width=512 height=512 >
+	<assets>
+		<scenes>
+			<scene name="Demo">
+				<geometry name="cena" type="BOX" material="box">
+					<TRANSLATE x=1.5 y=0 z=-1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo2">
+				<geometry name="cena2" type="BOX" material="box">
+					<TRANSLATE x=-1.5 y=0 z=-1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo3">
+				<geometry name="cena3" type="BOX" material="box">
+					<TRANSLATE x=1.5 y=0 z=1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo4">
+				<geometry name="cena4" type="BOX" material="box">
+					<TRANSLATE x=-1.5 y=0 z=1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo5">
+				<geometry name="cena5" type="SPHERE" material="sphere" SLICES=30 STACKS=30>
+					<TRANSLATE x=0 y=2 z=0 />
+				</geometry>
+			</scene>
+			<!--scene name="Axis">
+				<geometry name="axis" type="AXIS" material="box">
+					<SCALE x=5 y=5 z=5 />
+				</geometry>
+			</scene-->
+		</scenes>
+		
+		<viewports>
+			<viewport name="MainViewport">
+				<CLEAR_COLOR r="1.0" g="1.0" b="1.0" />
+			</viewport>
+		</viewports>
+		
+		<cameras>
+			<camera name="MainCamera" >
+				<viewport name="MainViewport" />
+				<projection TYPE="PERSPECTIVE" FOV="60.0" NEAR="0.3" FAR="100.0" />
+                <POSITION x="5.25622" y="3.30716" z="3.06599" w="1" />
+                <LOOK_AT_POINT x="4.49938" y="2.82773" z="2.62174" w="1" />
+				<UP x="0" y="1" z="0" />
+			</camera>
+		</cameras>
+		
+		<lights>
+			<light name="Sun" type="directional">
+				<DIRECTION x="1.0" y="-2.5" z="-2" />
+				<COLOR r="0.9" g="0.9" b="0.9" />
+				<AMBIENT r="0.3" g="0.3" b="0.3" />
+			</light>
+		</lights>
+		
+		<materialLibs>
+			<materialLib filename="geometry.hlsl.mlib"/>
+		</materialLibs> 
+	</assets>
+	
+	<pipelines>
+		<pipeline name="fixedfunction" default="true">
+			<pass class="default" name="pass1">
+				<scenes>
+					<scene name="Demo" />
+					<scene name="Demo2" />
+					<scene name="Demo3" />
+					<scene name="Demo4" />
+					<scene name="Demo5" />
+					<!--scene name="Axis" /-->
+				</scenes>
+				<camera name="MainCamera" />
+				<viewport name="MainViewport" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<materialMaps>
+					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demo" />
+					<map fromMaterial="sphere" toLibrary="DemoD3D" toMaterial="demo2" />
+				</materialMaps>
+			</pass>
+			
+		</pipeline>
+	</pipelines>
+	
+	
+</project>

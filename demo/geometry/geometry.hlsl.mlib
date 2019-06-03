@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<materiallib name="DemoD3D">
+
+    <textures>
+        <texture name="Crate" filename="crate.jpg" mipmap=true />
+        <texture name="Earth" filename="earth.jpg" mipmap=true />
+    </textures>
+
+    <shaders>
+        <shader name="demo" vs="../nauSettings/shaders/demo.vert.hlsl"
+                            ps="../nauSettings/shaders/demo.frag.hlsl" />
+    </shaders>
+
+    <materials>
+        <material name="demo">
+            <shader name="demo" >
+                <values>
+                    <valueof uniform="m_pvm" block="PerVertexData"
+                             type="RENDERER" context="CURRENT"
+                             component="PROJECTION_VIEW_MODEL" />
+                </values>
+            </shader>
+            <textures>
+                <texture name="Crate" UNIT="0" />
+            </textures>
+        </material>
+        <material name="demo2">
+            <shader name="demo" >
+                <values>
+                    <valueof uniform="m_pvm" block="PerVertexData"
+                             type="RENDERER" context="CURRENT"
+                             component="PROJECTION_VIEW_MODEL" />
+                </values>
+            </shader>
+            <textures>
+                <texture name="Earth" UNIT="0" />
+            </textures>
+        </material>
+    </materials>
+</materiallib>
