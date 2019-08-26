@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<project name="DemoD3D" width=512 height=512 >
+<project name="DemoD3D" width=1024 height=512 >
 	<assets>
 		<scenes>
 			<scene name="Demo">
@@ -38,11 +38,33 @@
 			<viewport name="MainViewport">
 				<CLEAR_COLOR r="1.0" g="1.0" b="1.0" />
 			</viewport>
+			<viewport name="dummy">
+				<ORIGIN x=0.0 y=0.0 />
+				<SIZE width=100 height=100 />
+				<CLEAR_COLOR r="0.2" g="0.2" b="0.4" />
+			</viewport>
+			<viewport name="SmallViewport1">
+				<ORIGIN x=0.0 y=0.0 />
+				<SIZE width=0.50 height=1 />
+				<CLEAR_COLOR r="0.2" g="0.2" b="0.4" />
+			</viewport>
+			<viewport name="SmallViewport2">
+				<ORIGIN x=0.50 y=0.0 />
+				<SIZE width=0.50 height=1 />
+				<CLEAR_COLOR r="0.2" g="0.2" b="0.4" />
+			</viewport>
 		</viewports>
 		
 		<cameras>
 			<camera name="MainCamera" >
 				<viewport name="MainViewport" />
+				<projection TYPE="PERSPECTIVE" FOV="60.0" NEAR="0.3" FAR="100.0" />
+                <POSITION x="5.25622" y="3.30716" z="3.06599" w="1" />
+                <LOOK_AT_POINT x="4.49938" y="2.82773" z="2.62174" w="1" />
+				<UP x="0" y="1" z="0" />
+			</camera>
+			<camera name="Camera">
+				<viewport name="dummy" />
 				<projection TYPE="PERSPECTIVE" FOV="60.0" NEAR="0.3" FAR="100.0" />
                 <POSITION x="5.25622" y="3.30716" z="3.06599" w="1" />
                 <LOOK_AT_POINT x="4.49938" y="2.82773" z="2.62174" w="1" />
@@ -64,7 +86,7 @@
 	</assets>
 	
 	<pipelines>
-		<pipeline name="fixedfunction" default="true">
+		<pipeline name="fixedfunction" default="true"> <!--defaultCamera="Camera"-->
 			<pass class="default" name="pass1">
 				<scenes>
 					<scene name="Demo" />
@@ -72,7 +94,6 @@
 					<scene name="Demo3" />
 					<scene name="Demo4" />
 					<scene name="Demo5" />
-					<!--scene name="Axis" /-->
 				</scenes>
 				<camera name="MainCamera" />
 				<viewport name="MainViewport" />
@@ -83,6 +104,88 @@
 					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demo" />
 					<map fromMaterial="sphere" toLibrary="DemoD3D" toMaterial="demo2" />
 				</materialMaps>
+			</pass>
+			<!--pass class="default" name="pass2">
+				<scenes>
+					<scene name="Demo2" />
+				</scenes>
+				<camera name="MainCamera" />
+				<viewport name="MainViewport" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<materialMaps>
+					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demorw" />
+				</materialMaps>
+			</pass-->
+			<!--pass class="default" name="pass3">
+				<scenes>
+					<scene name="Demo3" />
+				</scenes>
+				<camera name="MainCamera" />
+				<renderTarget name="demoRT" fromLibrary="DemoD3D" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<materialMaps>
+					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demoh2" />
+				</materialMaps>
+			</pass>
+			<pass class="quad" name="pass4">
+				<viewport name="MainViewport" />
+				<camera name="MainCamera" />
+				<texture name="colorMap" fromLibrary="DemoD3D" />
+			</pass-->
+			<!--pass class="quad" name="pass5">
+				<viewport name="MainViewport"/>
+				<texture name="Crate" fromLibrary="DemoD3D" />
+			</pass-->
+			<!--pass class="default" name="pass6">
+				<scenes>
+					<scene name="Demo4" />
+				</scenes>
+				<camera name="Camera" />
+				<renderTarget name="demoRT" fromLibrary="DemoD3D" />
+				<materialMaps>
+					<map fromMaterial="*" toLibrary="DemoD3D" toMaterial="demo" />
+				</materialMaps>
+			</pass>
+			<pass class="default" name="pass7">
+				<scenes>
+					<scene name="Demo4" />
+				</scenes>
+				<camera name="Camera" />
+				<viewport name="SmallViewport1" />
+				<materialMaps>
+					<map fromMaterial="*" toLibrary="DemoD3D" toMaterial="demo" />
+				</materialMaps>
+			</pass>
+			<pass class="quad" name="pass8">
+				<viewport name="SmallViewport2" />
+				<texture name="normalMap" fromLibrary="DemoD3D" />
+			</pass-->
+			<pass class="default" name="pass6">
+				<scenes>
+					<scene name="Demo" />
+					<scene name="Demo3" />
+					<scene name="Demo4" />
+					<scene name="Demo5" />
+					<!--scene name="DemoPlane" /-->
+				</scenes>
+				<camera name="MainCamera" />
+				<renderTarget name="demoRT" fromLibrary="DemoD3D" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<materialMaps>
+					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demoh1" />
+					<map fromMaterial="sphere" toLibrary="DemoD3D" toMaterial="demoh2" />
+				</materialMaps>
+			</pass>
+			<pass class="quad" name="pass2">
+                <viewport name="MainViewport" />
+				<camera name="MainCamera" />
+				<texture name="colorMap" fromLibrary="DemoD3D" />
 			</pass>
 			
 		</pipeline>

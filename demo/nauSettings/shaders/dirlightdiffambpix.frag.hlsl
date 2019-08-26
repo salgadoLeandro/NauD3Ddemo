@@ -1,5 +1,5 @@
-SamplerState s1 : register(s0);
-Texture2D t1 : register(t0);
+Texture2D texUnit : register(t0);
+SamplerState samp : register(s0);
 
 struct VS_OUTPUT {
     float4 vertexPos : SV_POSITION;
@@ -8,13 +8,10 @@ struct VS_OUTPUT {
     float2 TexCoord : TEXCOORD;
 };
 
-cbuffer Constantsd : register(b1) {
-    float4 lightDirection;
+cbuffer constantsFrag0 : register(b1) {
     float4 lightColor;
     float4 diffuse;
-    float4 ambient;
     float4 emission;
-    float shininess;
     int texCount;
 };
 
@@ -26,7 +23,7 @@ float4 main ( VS_OUTPUT input ) : SV_TARGET {
     float3 n;
     float intensity;
 
-    if (texCount != 0 && t1.Sample(s1, input.TexCoord).a <= 0.25)
+    if (texCount != 0 && texUnit.Sample(samp, input.TexCoord).a <= 0.25)
         discard;
     
     lightDir = -normalize(input.LightDirection);
@@ -40,8 +37,8 @@ float4 main ( VS_OUTPUT input ) : SV_TARGET {
         alpha = diffuse.a;
     }
     else {
-        color = (diffuse * lightIntensityDiffuse + emission + 0.3) * t1.Sample(s1, input.TexCoord);
-        alpha = t1.Sample(s1, input.TexCoord).a * diffuse.a;
+        color = (diffuse * lightIntensityDiffuse + emission + 0.3) * texUnit.Sample(samp, input.TexCoord);
+        alpha = texUnit.Sample(samp, input.TexCoord).a * diffuse.a;
     }
     return float4(float3(color.xyz), alpha);
 }

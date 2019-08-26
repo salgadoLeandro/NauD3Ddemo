@@ -1,5 +1,5 @@
-Texture2D t1 : register(t0);
-SamplerState s1 : register(s0);
+Texture2D texUnit : register(t0);
+SamplerState samp : register(s0);
 
 struct VS_OUTPUT {
     float4 position : SV_POSITION;
@@ -7,5 +7,5 @@ struct VS_OUTPUT {
 };
 
 float4 main(VS_OUTPUT input) : SV_TARGET {
-	return t1.Sample(s1, input.texCoordV);
+	return texUnit.Sample(samp, input.texCoordV);
 }

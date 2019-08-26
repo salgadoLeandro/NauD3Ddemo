@@ -9,7 +9,45 @@
     <shaders>
         <shader name="demo" vs="../nauSettings/shaders/demo.vert.hlsl"
                             ps="../nauSettings/shaders/demo.frag.hlsl" />
+        <shader name="demorw" vs="../nauSettings/shaders/demo.vert.hlsl"
+                              ps="../nauSettings/shaders/demorw.frag.hlsl" />
+        <shader name="demort" vs="../nauSettings/shaders/demo.vert.hlsl"
+                              ps="../nauSettings/shaders/demort.frag.hlsl" />
+        <shader name="demoh" vs="../nauSettings/shaders/demo.vert.hlsl"
+                             ps="../nauSettings/shaders/demoh.frag.hlsl" />
+        <shader name="demoh2" vs="../nauSettings/shaders/demo.vert.hlsl"
+                             ps="../nauSettings/shaders/demoh2.frag.hlsl" />
+        <shader name="democ" vs="../nauSettings/shaders/democ.vert.hlsl"
+                             ps="../nauSettings/shaders/democ.frag.hlsl" />
     </shaders>
+
+    <arraysOfTextures>
+        <arrayOfTextures name="T">
+            <TEXTURE_COUNT value=2 />
+            <WIDTH value="128" />
+            <HEIGHT value="128" />
+            <INTERNAL_FORMAT value="RGBA" />
+            <CREATE_BUFFER value=true />
+        </arrayOfTextures>
+    </arraysOfTextures>
+
+    <renderTargets>
+        <renderTarget name="demoRT">
+            <SIZE width=512 height=512 />
+            <depth name="depthMap" internalFormat="DEPTH_COMPONENT32F" />
+            <colors>
+                <color name="colorMap" internalFormat="RGBA32F" />
+                <color name="normalMap" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+        <renderTarget name="demoRayTrace">
+            <SIZE width=512 height=512 />
+            <depth name="depthMapRT" internalFormat="DEPTH_COMPONENT32F" />
+            <colors>
+                <color name="RTresult" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+    </renderTargets>
 
     <materials>
         <material name="demo">
@@ -21,7 +59,7 @@
                 </values>
             </shader>
             <textures>
-                <texture name="Crate" UNIT="0" />
+                <texture name="Crate" UNIT=0 />
             </textures>
         </material>
         <material name="demo2">
@@ -33,7 +71,59 @@
                 </values>
             </shader>
             <textures>
-                <texture name="Earth" UNIT="0" />
+                <texture name="Earth" UNIT=0 />
+            </textures>
+        </material>
+        <material name="demorw">
+            <shader name="demorw" >
+                <values>
+                    <valueof uniform="m_pvm" block="PerVertexData"
+                             type="RENDERER" context="CURRENT"
+                             component="PROJECTION_VIEW_MODEL" />
+                </values>
+            </shader>
+            <imageTextures>
+                <imageTexture UNIT=1 texture="Crate">
+                    <ACCESS value="WRITE_ONLY" />
+                    <LEVEL value=0 />
+                </imageTexture>
+            </imageTextures>
+        </material>
+        <material name="demort">
+            <shader name="demort">
+                <values>
+                    <valueof uniform="m_pvm" block="PerVertexData"
+                             type="RENDERER" context="CURRENT"
+                             component="PROJECTION_VIEW_MODEL" />
+                </values>
+            </shader>
+        </material>
+        <material name="demoh">
+            <shader name="demoh">
+                <values>
+                    <valueof uniform="m_pvm" block="PerVertexData"
+                             type="RENDERER" context="CURRENT"
+                             component="PROJECTION_VIEW_MODEL" />
+                </values>
+            </shader>
+            <textures>
+                <texture name="Crate" UNIT=0 />
+            </textures>
+        </material>
+        <material name="demoh2">
+            <shader name="demoh2">
+                <values>
+                    <valueof uniform="m_pvm" block="PerVertexData"
+                             type="RENDERER" context="CURRENT"
+                             component="PROJECTION_VIEW_MODEL" />
+                </values>
+            </shader>
+        </material>
+        <material name="democ">
+            <shader name="democ" />
+            <textures>
+                <texture name="colorMap" UNIT=0 />
+                <texture name="RTresult" UNIT=1 />
             </textures>
         </material>
     </materials>

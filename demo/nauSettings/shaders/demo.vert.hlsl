@@ -15,6 +15,7 @@ struct VS_OUTPUT {
 };
 
 VS_OUTPUT main ( VS_INPUT input ) {
+    
     VS_OUTPUT output;
     output.position = mul(m_pvm, input.position);
     output.color = abs(input.normal);

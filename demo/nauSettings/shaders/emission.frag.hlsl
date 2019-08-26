@@ -6,9 +6,9 @@ struct VS_OUTPUT {
     float2 TexCoord : TEXCOORD;
 };
 
-cbuffer Constantse : register(b1) {
+cbuffer constantsFrag1 : register(b1) {
     float4 emission;
-    int texCount = 0;
+    int texCount;
 };
 
 float4 main ( VS_OUTPUT input ) : SV_TARGET {

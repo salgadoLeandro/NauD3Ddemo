@@ -1,0 +1,223 @@
+<?xml version="1.0" ?>
+<project name="DemoD3D" width=512 height=512 >
+	<assets>
+		<scenes>
+			<scene name="Demo">
+				<geometry name="cena" type="BOX" material="box">
+					<TRANSLATE x=1.5 y=0 z=-1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo2">
+				<geometry name="cena2" type="BOX" material="box">
+					<TRANSLATE x=-1.5 y=0 z=-1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo3">
+				<geometry name="cena3" type="BOX" material="box">
+					<TRANSLATE x=1.5 y=0 z=1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo4">
+				<geometry name="cena4" type="BOX" material="box">
+					<TRANSLATE x=-1.5 y=0 z=1.5 />
+				</geometry>
+			</scene>
+			<scene name="Demo5">
+				<geometry name="cena5" type="SPHERE" material="sphere" SLICES=30 STACKS=30>
+					<TRANSLATE x=0 y=2 z=0 />
+				</geometry>
+			</scene>
+			<scene name="DemoRT1">
+				<geometry name="cenaRT1" type="BOX" material="box">
+					<TRANSLATE x=3 y=0 z=5 />
+				</geometry>
+			</scene>
+			<scene name="DemoRT2">
+				<geometry name="cenaRT2" type="BOX" material="box">
+					<TRANSLATE x=-3 y=0 z=5 />
+				</geometry>
+			</scene>
+			<scene name="DemoPlane">
+				<geometry name="cenaPlane" type="SQUARE" material="plane">
+					<TRANSLATE x=0 y=-1 z=5 />
+					<SCALE x=10 y=10 z=10 />
+				</geometry>
+			</scene>
+		</scenes>
+		
+		<viewports>
+			<viewport name="MainViewport">
+				<CLEAR_COLOR r="1.0" g="1.0" b="1.0" />
+			</viewport>
+			<viewport name="dummy">
+				<ORIGIN x=0.0 y=0.0 />
+				<SIZE width=100 height=100 />
+				<CLEAR_COLOR r="0.2" g="0.2" b="0.4" />
+			</viewport>
+			<viewport name="SmallViewport1">
+				<ORIGIN x=0.0 y=0.0 />
+				<SIZE width=0.50 height=1 />
+				<CLEAR_COLOR r="0.2" g="0.2" b="0.4" />
+			</viewport>
+			<viewport name="SmallViewport2">
+				<ORIGIN x=0.50 y=0.0 />
+				<SIZE width=0.50 height=1 />
+				<CLEAR_COLOR r="0.2" g="0.2" b="0.4" />
+			</viewport>
+		</viewports>
+		
+		<cameras>
+			<camera name="MainCamera" >
+				<viewport name="MainViewport" />
+				<projection TYPE="PERSPECTIVE" FOV="60.0" NEAR="0.3" FAR="100.0" />
+                <POSITION x="5.25622" y="3.30716" z="3.06599" w="1" />
+                <LOOK_AT_POINT x="4.49938" y="2.82773" z="2.62174" w="1" />
+				<UP x="0" y="1" z="0" />
+			</camera>
+			<camera name="Camera">
+				<viewport name="dummy" />
+				<projection TYPE="PERSPECTIVE" FOV="60.0" NEAR="0.3" FAR="100.0" />
+                <POSITION x="5.25622" y="3.30716" z="3.06599" w="1" />
+                <LOOK_AT_POINT x="4.49938" y="2.82773" z="2.62174" w="1" />
+				<UP x="0" y="1" z="0" />
+			</camera>
+			<camera name="MainCamera2" >
+				<viewport name="MainViewport" />
+				<projection TYPE="PERSPECTIVE" FOV="60.0" NEAR="0.3" FAR="100.0" />
+                <POSITION x="0" y="2" z="-5" w="1" />
+                <LOOK_AT_POINT x="0" y="0" z="0" w="1" />
+				<UP x="0" y="1" z="0" />
+			</camera>
+		</cameras>
+		
+		<lights>
+			<light name="Sun" type="directional">
+				<DIRECTION x="1.0" y="-2.5" z="-2.0" />
+				<COLOR r="0.9" g="0.9" b="0.9" />
+				<AMBIENT r="0.3" g="0.3" b="0.3" />
+			</light>
+		</lights>
+		
+		<materialLibs>
+			<materialLib filename="geometry.hlsl.mlib"/>
+		</materialLibs> 
+	</assets>
+	
+	<pipelines>
+		<pipeline name="fixedfunction" default="true">
+			<pass class="default" name="pass6">
+				<scenes>
+					<scene name="Demo" />
+					<scene name="Demo3" />
+					<scene name="Demo4" />
+					<scene name="Demo5" />
+					<scene name="DemoPlane" />
+				</scenes>
+				<camera name="MainCamera2" />
+				<renderTarget name="demoRT" fromLibrary="DemoD3D" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<materialMaps>
+					<map fromMaterial="*" toLibrary="DemoD3D" toMaterial="demoh2" />
+					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demoh" />
+				</materialMaps>
+			</pass>
+			<pass class="optix" name="pass1">
+                <scenes>
+					<scene name="Demo" />
+					<scene name="Demo3" />
+					<scene name="Demo4" />
+					<scene name="Demo5" />
+					<scene name="DemoPlane" />
+                </scenes>
+                <camera name="MainCamera2" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<renderTarget name="demoRT" fromLibrary="DemoD3D" />
+                <optixEntryPoint>
+                    <optixProgram type="RayGen" file="../nauSettings/shaders/shaders.hlsl" proc="rayGen" />
+                </optixEntryPoint>
+                <optixDefaultMaterial>
+                    <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="chit" />
+                    <optixProgram type="Miss" 		 ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="miss"/> 
+					<optixProgram type="Miss" 		 ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowMiss"/>
+					<optixProgram type="Any_Hit"  	 ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit"/>
+                </optixDefaultMaterial>
+				<optixGlobalAttributes>
+					<valueof optixVar="lightDir" type="LIGHT" context="CURRENT" id=0 component="DIRECTION" />
+				</optixGlobalAttributes>
+				<optixInput>
+					<buffer var="posBuffer" texture="DemoD3D::colorMap" />
+				</optixInput>
+                <optixOutput>
+                    <buffer var="gOutput" texture="DemoD3D::RTresult" />
+                </optixOutput>
+            </pass>
+			<pass class="quad" name="pass2">
+                <viewport name="MainViewport" />
+				<camera name="MainCamera2" />
+				<materialMaps>
+					<map fromMaterial="__Quad" toLibrary="DemoD3D" toMaterial="democ" />
+				</materialMaps>
+			</pass>
+		</pipeline>
+
+		<pipeline name="fixedfunction2" default="true">
+			<pass class="optix" name="pass1">
+                <scenes>
+					<scene name="Demo" />
+					<scene name="Demo3" />
+					<scene name="Demo4" />
+					<scene name="Demo5" />
+					<scene name="DemoPlane" />
+                </scenes>
+                <camera name="MainCamera2" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<viewport name="MainViewport" />
+                <optixEntryPoint>
+                    <optixProgram type="RayGen" file="../nauSettings/shaders/shaders.hlsl" proc="rayGen2" />
+                </optixEntryPoint>
+                <optixDefaultMaterial>
+                    <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="chit" />
+                    <optixProgram type="Miss" 		 ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="miss"/> 
+					<optixProgram type="Miss" 		 ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowMiss"/>
+					<optixProgram type="Any_Hit"  	 ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit"/>
+                </optixDefaultMaterial>
+                <optixMaterialMap>
+                    <optixMap to="__nau_material_lib:sphere">
+                        <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="chit2"/> 
+						<optixProgram type="Any_Hit" ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit2"/>
+                    </optixMap>
+                    <optixMap to="__nau_material_lib:plane">
+                        <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="chit3"/>
+                    </optixMap>
+                </optixMaterialMap>
+                <!--optixVertexAttributes>
+					<attribute name="position"/>
+					<attribute name="normal"/>
+					<attribute name="texCoord0"/>
+					<attribute name="index" />
+				</optixVertexAttributes>
+                <optixMaterialAttributes>
+					<valueof optixVar="diffuse" type="COLOR" context="CURRENT" component="DIFFUSE" />
+					<valueof optixVar="texCount" type="RENDERER" context="CURRENT" component="TEXTURE_COUNT" />
+				</optixMaterialAttributes-->
+				<optixGlobalAttributes>
+					<valueof optixVar="lightDir" type="LIGHT" context="CURRENT" id=0 component="DIRECTION" />
+				</optixGlobalAttributes>
+				<!--optixInput>
+					<buffer var="posBuffer" texture="DemoD3D::colorMap" />
+				</optixInput-->
+                <optixOutput>
+                    <buffer var="gOutput"/>
+                </optixOutput>
+            </pass>
+		</pipeline>
+	</pipelines>
+	
+	
+</project>

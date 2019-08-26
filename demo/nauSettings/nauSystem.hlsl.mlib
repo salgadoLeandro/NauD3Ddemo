@@ -35,32 +35,34 @@
 		<material name="__nauDefault">
 			<shader name = "dirLightDifAmbPix">
 				<values>
-					<valueof uniform="lightDirection" 	type="LIGHT" context="CURRENT" 
-														id=0 component="DIRECTION" /> 
-														
-					<valueof uniform="lightColor"     	type="LIGHT" context="CURRENT" 
-														id=0 component="COLOR" />
-														
-					<valueof uniform="diffuse" 		  	type="COLOR" context="CURRENT" 
-														component="DIFFUSE" />
-														
-					<valueof uniform="emission" 		type="COLOR" context="CURRENT" 
-														component="EMISSION" />
-														
-					<valueof uniform="PVM"          	type="RENDERER" context="CURRENT" 
-														component="PROJECTION_VIEW_MODEL" />
-														
-					<valueof uniform="V"          		type="RENDERER" context="CURRENT" 
-														component="VIEW" />
+					<valueof uniform="PVM" 	block="constantsVert0"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="V" 	block="constantsVert0"
+											type="RENDERER" context="CURRENT"
+											component="VIEW" />
+					<valueof uniform="lightDirection" 	block="constantsVert0"
+														type="LIGHT" context="CURRENT"
+														component="DIRECTION" id="0" />
+					<valueof uniform="NormalMatrix"	block="constantsVert0"
+													type="RENDERER" context="CURRENT"
+													component="NORMAL" />
 
-					<valueof uniform="NormalMatrix"   	type="RENDERER" context="CURRENT" 
-														component="NORMAL" />
-					
-					<valueof uniform="texCount"			type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-														
-					<valueof uniform="texUnit" 			type="TEXTURE_BINDING" context="CURRENT" 
-														component="UNIT" id="0" />														
+					<valueof uniform="lightColor" 	block="constantsFrag0"
+													type="LIGHT" context="CURRENT"
+							 						component="COLOR" id="0" />
+					<valueof uniform="diffuse"	block="constantsFrag0"
+												type="COLOR" context="CURRENT"
+												component="DIFFUSE" />
+					<valueof uniform="emission"	block="constantsFrag0"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag0"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />														
 				</values>
 			</shader>
 		</material>		
@@ -101,17 +103,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-													component="TEXTURE_COUNT" />
-													
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />
 				</values>
 			</shader>
 		</material>
@@ -126,17 +130,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />			
 
 				</values>
 			</shader>
@@ -152,17 +158,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />			
 
 				</values>
 			</shader>
@@ -178,17 +186,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />		
 
 				</values>
 			</shader>
@@ -204,17 +214,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />		
 
 				</values>
 			</shader>
@@ -230,17 +242,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />		
 
 				</values>
 			</shader>
@@ -256,17 +270,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />			
 
 				</values>
 			</shader>
@@ -282,17 +298,19 @@
 			</color>
 			<shader name="emission">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-														
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert1"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
 					
-					<valueof uniform="texCount"	type="RENDERER" context="CURRENT" 
-														component="TEXTURE_COUNT" />
-
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />			
+					<valueof uniform="emission"	block="constantsFrag1"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
+					<valueof uniform="texCount"	block="constantsFrag1"
+												type="RENDERER" context="CURRENT"
+												component="TEXTURE_COUNT" />
+					
+					<valueof uniform="texUnit"	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />		
 
 				</values>
 			</shader>
@@ -312,14 +330,16 @@
 			</color>
 			<shader name="font">
 				<values>
-					<valueof uniform="emission" type="COLOR" context="CURRENT" 
-													component="EMISSION" />
-															
-					<valueof uniform="PVM"      type="RENDERER" context="CURRENT" 
-													component="PROJECTION_VIEW_MODEL" />
+					<valueof uniform="PVM"	block="constantsVert2"
+											type="RENDERER" context="CURRENT"
+											component="PROJECTION_VIEW_MODEL" />
+					
+					<valueof uniform="emission"	block="constantsFrag2"
+												type="COLOR" context="CURRENT"
+												component="EMISSION" />
 
-					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT" 
-													component="UNIT" id="0" />
+					<valueof uniform="texUnit" 	type="TEXTURE_BINDING" context="CURRENT"
+												component="UNIT" id="0" />
 				</values>
 			</shader>
 			<state name="__Transparent"/>

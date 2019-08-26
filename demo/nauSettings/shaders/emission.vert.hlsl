@@ -8,7 +8,7 @@ struct VS_OUTPUT {
     float2 TexCoord : TEXCOORD;
 };
 
-cbuffer ConstantBuffere : register(b0) {
+cbuffer constantsVert1 : register(b0) {
     float4x4 PVM;
 };
 

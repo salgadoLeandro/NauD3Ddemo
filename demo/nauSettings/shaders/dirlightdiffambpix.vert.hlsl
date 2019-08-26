@@ -11,17 +11,17 @@ struct VS_OUTPUT {
     float2 TexCoord : TEXCOORD;
 };
 
-cbuffer ConstantBufferd : register(b0) {
+cbuffer constantsVert0 : register(b0) {
     float4x4 PVM;
     float4x4 V;
+    float4 lightDirection;
     float3x3 NormalMatrix;
-    float4 lighDirection;
 };
 
 VS_OUTPUT main ( VS_INPUT input ) {
     VS_OUTPUT output;
     output.Normal = normalize(mul(NormalMatrix, float3(input.normal.xyz)));
-    output.LightDirection = normalize(float3(mul(V, lighDirection).xyz));
+    output.LightDirection = normalize(float3(mul(V, lightDirection).xyz));
     output.TexCoord = float2(input.texCoord0.xy);
     output.vertexPos = mul(PVM, input.position);
     return output;
