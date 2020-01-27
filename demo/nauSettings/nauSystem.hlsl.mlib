@@ -15,6 +15,7 @@
 									vs="shaders/emission.vert.hlsl" />
 		<shader name="font" 		ps="shaders/font.frag.hlsl" 
 									vs="shaders/font.vert.hlsl" />
+		<shader name="mips"			cs="shaders/GenerateMips.hlsl" />
 	</shaders>
 	
 	<states>
@@ -346,6 +347,10 @@
 			<textures>
 				<texture UNIT="0" name="__FontCourierNew10" />					
 			</textures>
+		</material>
+
+		<material name="GenerateMips">
+			<shader name="mips" />
 		</material>
 	</materials>
 </materiallib>

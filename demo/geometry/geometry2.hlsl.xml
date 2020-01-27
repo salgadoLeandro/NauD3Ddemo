@@ -28,18 +28,28 @@
 				</geometry>
 			</scene>
 			<scene name="DemoRT1">
-				<geometry name="cenaRT1" type="BOX" material="box">
-					<TRANSLATE x=3 y=0 z=5 />
+				<geometry name="cenaRT1" type="BOX" material="DemoD3D::demoCaixa">
+					<TRANSLATE x=1.5 y=0 z=-1.5 />
 				</geometry>
 			</scene>
-			<scene name="DemoRT2">
-				<geometry name="cenaRT2" type="BOX" material="box">
-					<TRANSLATE x=-3 y=0 z=5 />
+			<scene name="DemoRT3">
+				<geometry name="cenaRT3" type="BOX" material="DemoD3D::demoCaixa">
+					<TRANSLATE x=1.5 y=0 z=1.5 />
+				</geometry>
+			</scene>
+			<scene name="DemoRT4">
+				<geometry name="cenaRT4" type="BOX" material="DemoD3D::demoCaixa">
+					<TRANSLATE x=-1.5 y=0 z=1.5 />
+				</geometry>
+			</scene>
+			<scene name="DemoRT5">
+				<geometry name="cenaRT5" type="SPHERE" material="DemoD3D::demoEsfera" SLICES=30 STACKS=30>
+					<TRANSLATE x=0 y=2 z=0 />
 				</geometry>
 			</scene>
 			<scene name="DemoPlane">
 				<geometry name="cenaPlane" type="SQUARE" material="plane">
-					<TRANSLATE x=0 y=-1 z=5 />
+					<TRANSLATE x=0 y=-1 z=0 />
 					<SCALE x=10 y=10 z=10 />
 				</geometry>
 			</scene>
@@ -104,7 +114,7 @@
 	</assets>
 	
 	<pipelines>
-		<pipeline name="fixedfunction" default="true">
+		<pipeline name="fixedfunction" default="true" defaultCamera="MainCamera2">
 			<pass class="default" name="pass6">
 				<scenes>
 					<scene name="Demo" />
@@ -115,15 +125,21 @@
 				</scenes>
 				<camera name="MainCamera2" />
 				<renderTarget name="demoRT" fromLibrary="DemoD3D" />
+				<!--viewport name="MainViewport" /-->
 				<lights>
 					<light name="Sun" />
 				</lights>
 				<materialMaps>
 					<map fromMaterial="*" toLibrary="DemoD3D" toMaterial="demoh2" />
-					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demoh" />
+					<map fromMaterial="sphere" toLibrary="DemoD3D" toMaterial="demo2" />
+					<map fromMaterial="box" toLibrary="DemoD3D" toMaterial="demo" />
 				</materialMaps>
 			</pass>
-			<pass class="optix" name="pass1">
+			<pass class="quad" name="pass2">
+                <viewport name="MainViewport" />
+				<texture name="colorMap" fromLibrary="DemoD3D" />
+			</pass>
+			<!--pass class="optix" name="pass1">
                 <scenes>
 					<scene name="Demo" />
 					<scene name="Demo3" />
@@ -161,10 +177,10 @@
 				<materialMaps>
 					<map fromMaterial="__Quad" toLibrary="DemoD3D" toMaterial="democ" />
 				</materialMaps>
-			</pass>
+			</pass-->
 		</pipeline>
 
-		<pipeline name="fixedfunction2" default="true">
+		<!--pipeline name="fixedfunction2" default="true">
 			<pass class="optix" name="pass1">
                 <scenes>
 					<scene name="Demo" />
@@ -188,35 +204,77 @@
 					<optixProgram type="Any_Hit"  	 ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit"/>
                 </optixDefaultMaterial>
                 <optixMaterialMap>
-                    <optixMap to="__nau_material_lib:sphere">
+                    <optixMap to="__nau_material_lib:DemoD3D::demoEsfera">
                         <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="chit2"/> 
-						<optixProgram type="Any_Hit" ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit2"/>
+						<optixProgram type="Any_Hit" ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit"/>
                     </optixMap>
                     <optixMap to="__nau_material_lib:plane">
                         <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="chit3"/>
+						<optixProgram type="Any_Hit" ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit"/>
                     </optixMap>
                 </optixMaterialMap>
-                <!--optixVertexAttributes>
+                <optixVertexAttributes>
 					<attribute name="position"/>
-					<attribute name="normal"/>
 					<attribute name="texCoord0"/>
 					<attribute name="index" />
 				</optixVertexAttributes>
                 <optixMaterialAttributes>
 					<valueof optixVar="diffuse" type="COLOR" context="CURRENT" component="DIFFUSE" />
 					<valueof optixVar="texCount" type="RENDERER" context="CURRENT" component="TEXTURE_COUNT" />
-				</optixMaterialAttributes-->
+				</optixMaterialAttributes>
 				<optixGlobalAttributes>
 					<valueof optixVar="lightDir" type="LIGHT" context="CURRENT" id=0 component="DIRECTION" />
 				</optixGlobalAttributes>
-				<!--optixInput>
-					<buffer var="posBuffer" texture="DemoD3D::colorMap" />
-				</optixInput-->
                 <optixOutput>
                     <buffer var="gOutput"/>
                 </optixOutput>
             </pass>
-		</pipeline>
+		</pipeline-->
+
+		<!--pipeline name="fixedfunction3" default="true">
+			<pass class="optix" name="pass1">
+                <scenes>
+					<scene name="DemoRT1" />
+					<scene name="DemoRT3" />
+					<scene name="DemoRT4" />
+					<scene name="DemoRT5" />
+					<scene name="DemoPlane" />
+                </scenes>
+                <camera name="MainCamera2" />
+				<lights>
+					<light name="Sun" />
+				</lights>
+				<viewport name="MainViewport" />
+                <optixEntryPoint>
+                    <optixProgram type="RayGen" file="../nauSettings/shaders/shaders.hlsl" proc="rayGen2" />
+                </optixEntryPoint>
+                <optixDefaultMaterial>
+                    <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="closesthit" />
+                    <optixProgram type="Miss" 		 ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="miss"/> 
+					<optixProgram type="Miss" 		 ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowMiss"/>
+					<optixProgram type="Any_Hit"  	 ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit"/>
+                </optixDefaultMaterial>
+                <optixMaterialMap>
+                    <optixMap to="__nau_material_lib:plane">
+                        <optixProgram type="Closest_Hit" ray="Phong" file="../nauSettings/shaders/shaders.hlsl" proc="chit3"/>
+						<optixProgram type="Any_Hit" ray="Shadow" file="../nauSettings/shaders/shaders.hlsl" proc="shadowahit"/>
+                    </optixMap>
+                </optixMaterialMap>
+                <optixVertexAttributes>
+					<attribute name="position"/>
+					<attribute name="texCoord0"/>
+					<attribute name="index" />
+				</optixVertexAttributes>
+                <optixMaterialAttributes>
+					<valueof optixVar="diffuse" type="COLOR" context="CURRENT" component="DIFFUSE" />
+					<valueof optixVar="texCount" type="RENDERER" context="CURRENT" component="TEXTURE_COUNT" />
+				</optixMaterialAttributes>
+				<optixGlobalAttributes>
+					<valueof optixVar="lightDir" type="LIGHT" context="CURRENT" id=0 component="DIRECTION" />
+				</optixGlobalAttributes>
+            </pass>
+		</pipeline-->
+
 	</pipelines>
 	
 	

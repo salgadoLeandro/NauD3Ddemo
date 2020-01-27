@@ -1,0 +1,251 @@
+<?xml version="1.0" ?>
+<materiallib name="Hybrid Rendering">
+    <renderTargets>
+        <renderTarget name="d3d">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <CLEAR_VALUES r=0.26 g=0.5 b=0.89 />
+            <colors>
+                <color name="offscreenrenderD3D" internalFormat="RGBA32F" />
+                <color name="mask" internalFormat="RGBA32F" />
+                <color name="gPositions" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="dxr">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <CLEAR_VALUES r="1.0" g="1.0" b="1.0" />
+            <colors>
+                <color name="offscreenrenderDXR" internalFormat="RGBA32F" />
+                <color name="offscreenrenderRTAO" internalFormat="R32F" />
+                <color name="offscreenrenderRTS" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="denoised">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <CLEAR_VALUES r=0.26 g=0.5 b=0.89 />
+            <colors>
+                <color name="RTAOaccumulated" internalFormat="RGBA32F" />
+                <color name="RTAOdenoised" internalFormat="RGBA32F" />
+                <color name="CombineDenoise" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="combine">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <CLEAR_VALUES r=0.26 g=0.5 b=0.89 />
+            <colors>
+                <color name="offscreenrenderC" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="depthM">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <colors>
+                <color name="depthMap" internalFormat="R32F" />
+            </colors>
+        </renderTarget>
+    </renderTargets>
+
+    <shaders>
+        <shader name="raster"       vs="shaders/raster.vert.hlsl"
+                                    ps="shaders/raster.frag.hlsl" />
+        <shader name="mask"         vs="shaders/raster.vert.hlsl"
+                                    ps="shaders/mask.frag.hlsl" />
+        <shader name="comp"         cs="shaders/comp.hlsl" />
+        <shader name="combine"      vs="shaders/combine.vert.hlsl"
+                                    ps="shaders/combine.frag.hlsl" />
+        <shader name="tonemap"      vs="shaders/combine.vert.hlsl"
+                                    ps="shaders/tonemap.frag.hlsl" />
+        <shader name="denoiseAO"    cs="shaders/denoiseAO.hlsl" />
+        <shader name="denoise"      cs="shaders/denoise.hlsl" />
+    </shaders>
+
+    <materials>
+        <material name="raster">
+            <shader name="raster">
+                <values>
+                    <valueof uniform="m_pvm"    block="ConstBuffer"
+                                                type="RENDERER" context="CURRENT"
+                                                component="PROJECTION_VIEW_MODEL" />
+                    <valueof uniform="diffuse"  block="ConstantsFrag"
+                                                type="COLOR" context="CURRENT"
+                                                component="DIFFUSE" />
+                    <valueof uniform="texCount" block="ConstantsFrag"
+                                                type="RENDERER" context="CURRENT"
+                                                component="TEXTURE_COUNT" />
+                </values>
+            </shader>
+        </material>
+
+        <material name="mask">
+            <shader name="mask">
+                <values>
+                    <valueof uniform="m_pvm"    block="ConstBuffer"
+                                                type="RENDERER" context="CURRENT"
+                                                component="PROJECTION_VIEW_MODEL" />
+                    <valueof uniform="diffuse"  block="ConstantsFrag"
+                                                type="COLOR" context="CURRENT"
+                                                component="DIFFUSE" />
+                    <valueof uniform="texCount" block="ConstantsFrag"
+                                                type="RENDERER" context="CURRENT"
+                                                component="TEXTURE_COUNT" />
+                </values>
+            </shader>
+        </material>
+
+        <material name="comp">
+            <shader name="comp" />
+            <imageTextures>
+                <imageTexture UNIT=0 texture="offscreenrenderRTAO">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="RTAOaccumulated">
+                    <ACCESS value="READ_WRITE" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+        <material name="combine">
+            <shader name="combine" />
+            <textures>
+                <texture UNIT=0 name="offscreenrenderD3D" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+                <texture UNIT=1 name="mask">
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+                <texture UNIT=2 name="offscreenrenderDXR">
+                    <MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+                    <MAG_FILTER value="NEAREST" />
+                    <WRAP_S value="CLAMP_TO_BORDER" />
+                    <WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+				<texture UNIT=3 name="RTAOaccumulated" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+				<texture UNIT=4 name="offscreenrenderRTS" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+            </textures>
+        </material>
+
+        <material name="combineDenoise">
+            <shader name="combine" />
+            <textures>
+                <texture UNIT=0 name="offscreenrenderD3D" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+                <texture UNIT=1 name="mask">
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+                <texture UNIT=2 name="offscreenrenderDXR">
+                    <MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+                    <MAG_FILTER value="NEAREST" />
+                    <WRAP_S value="CLAMP_TO_BORDER" />
+                    <WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+				<texture UNIT=3 name="RTAOdenoised" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+				<texture UNIT=4 name="offscreenrenderRTS" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+            </textures>
+        </material>
+
+        <material name="tonemap">
+            <shader name="tonemap" />
+            <textures>
+                <!--texture UNIT=0 name="CombineDenoise" -->
+                <texture UNIT=0 name="offscreenrenderC" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+            </textures>
+        </material>
+
+        <material name="tonemapD">
+            <shader name="tonemap" />
+            <textures>
+                <texture UNIT=0 name="CombineDenoise" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+            </textures>
+        </material>
+
+        <material name="denoiseAO">
+            <shader name="denoiseAO" />
+            <imageTextures>
+                <imageTexture UNIT=0 texture="RTAOaccumulated">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="gPositions">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=2 texture="RTAOdenoised">
+                    <ACCESS value="READ_WRITE" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+        <material name="denoiseAO_na">
+            <shader name="denoiseAO" />
+            <imageTextures>
+                <imageTexture UNIT=0 texture="offscreenrenderRTAO">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="gPositions">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=2 texture="RTAOdenoised">
+                    <ACCESS value="READ_WRITE" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+        <material name="denoise">
+            <shader name="denoise" />
+            <imageTextures>
+                <imageTexture UNIT=0 texture="depthMap">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="offscreenrenderC" >
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=2 texture="CombineDenoise">
+                    <ACCESS value="READ_WRITE" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+    </materials>
+</materiallib>

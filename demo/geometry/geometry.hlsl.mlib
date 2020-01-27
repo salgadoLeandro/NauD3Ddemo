@@ -16,9 +16,10 @@
         <shader name="demoh" vs="../nauSettings/shaders/demo.vert.hlsl"
                              ps="../nauSettings/shaders/demoh.frag.hlsl" />
         <shader name="demoh2" vs="../nauSettings/shaders/demo.vert.hlsl"
-                             ps="../nauSettings/shaders/demoh2.frag.hlsl" />
+                              ps="../nauSettings/shaders/demoh2.frag.hlsl" />
         <shader name="democ" vs="../nauSettings/shaders/democ.vert.hlsl"
                              ps="../nauSettings/shaders/democ.frag.hlsl" />
+        <shader name="democomp" cs="../nauSettings/shaders/demo.comp.hlsl" />
     </shaders>
 
     <arraysOfTextures>
@@ -32,6 +33,13 @@
     </arraysOfTextures>
 
     <renderTargets>
+        <renderTarget name="demoT">
+            <SIZE width=512 height=512 />
+            <depth name="depthMapT" internalFormat="DEPTH_COMPONENT32F" />
+            <colors>
+                <color name="mapT" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
         <renderTarget name="demoRT">
             <SIZE width=512 height=512 />
             <depth name="depthMap" internalFormat="DEPTH_COMPONENT32F" />
@@ -125,6 +133,34 @@
                 <texture name="colorMap" UNIT=0 />
                 <texture name="RTresult" UNIT=1 />
             </textures>
+        </material>
+        <material name="demoCaixa">
+            <textures>
+                <texture name="Crate" UNIT=0 />
+            </textures>
+        </material>
+        <material name="demoEsfera">
+            <textures>
+                <texture name="Earth" UNIT=0 />
+            </textures>
+        </material>
+        <material name="teste">
+            <shader name="demo" >
+                <values>
+                    <valueof uniform="m_pvm" block="PerVertexData"
+                             type="RENDERER" context="CURRENT"
+                             component="PROJECTION_VIEW_MODEL" />
+                </values>
+            </shader>
+        </material>
+        <material name="ComputeTeste">
+            <shader name="democomp" />
+            <imageTextures>
+                <imageTexture UNIT=1 texture="mapT">
+                    <ACCESS value="WRITE_ONLY" />
+                    <LEVEL value=0 />
+                </imageTexture>
+            </imageTextures>
         </material>
     </materials>
 </materiallib>

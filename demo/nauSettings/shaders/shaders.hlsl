@@ -1,6 +1,14 @@
 RaytracingAccelerationStructure gRtScene : register(t0);
-RWTexture2D<float4> gOutput : register(u0);
+
+RWTexture2D<float4> output0 : register(u0);
 RWTexture2D<float4> posBuffer : register(u1);
+
+ByteAddressBuffer position[5] : register(t1);
+ByteAddressBuffer texCoord0[5] : register(t6);
+ByteAddressBuffer index[5] : register(t11);
+
+Texture2D<float4> tex[5] : register(t16);
+
 cbuffer Camera : register(b0) {
 	float4 eye;
 	float4 V;
@@ -8,8 +16,18 @@ cbuffer Camera : register(b0) {
 	float4 W;
 	float fov;
 };
+
 cbuffer GlobalAttributes : register(b1) {
 	float4 lightDir;
+};
+
+struct MaterialAttrs {
+	float4 diffuse;
+	int texCount;
+};
+
+cbuffer MaterialAttributes : register(b2) {
+	MaterialAttrs materialAttributes[5];
 };
 
 struct RayPayload {
@@ -22,6 +40,7 @@ struct ShadowPayload {
 	bool hit;
 };
 
+static const float PI = 3.14159265f;
 
 [shader("raygeneration")]
 void rayGen() {  
@@ -45,20 +64,17 @@ void rayGen() {
 
 		RayDesc ray;
 		ray.Origin = eye.xyz;
-		//ray.Origin = float3(0, 0, -2);
-		//ray.Direction = normalize(d.x*u*fov + d.y*v*fov + w);
-		ray.Direction = normalize(float3(d.x * aspectRatio, d.y, 1));
-
+		ray.Direction = normalize(d.x*u*fov + d.y*v*fov + w);
 		ray.TMin = 0;
 		ray.TMax = 100000;
 
 		RayPayload payload;
 		TraceRay(gRtScene, 0, 0xFF, 0, 2, 0, ray, payload);
 		float3 col = payload.color;
-		gOutput[launchIndex.xy] = float4(col, 1.0);
+		output0[launchIndex.xy] = float4(col, 1.0);
 	}
 	else {
-		gOutput[launchIndex.xy] = float4(1.0f, 1.0f, 1.0f, 0.0f);
+		output0[launchIndex.xy] = float4(1.0f, 1.0f, 1.0f, 0.0f);
 	}
 }
 
@@ -82,17 +98,14 @@ void rayGen2() {
 
 	RayDesc ray;
 	ray.Origin = eye.xyz;
-	//ray.Origin = float3(0, 0, -2);
-	//ray.Direction = normalize(d.x*u*fov + d.y*v*fov + w);
-	ray.Direction = normalize(float3(d.x * aspectRatio, d.y, 1));
-
+	ray.Direction = normalize(d.x*u*fov + d.y*v*fov + w);
 	ray.TMin = 0;
 	ray.TMax = 100000;
 
 	RayPayload payload;
 	TraceRay(gRtScene, 0, 0xFF, 0, 2, 0, ray, payload);
 	float3 col = payload.color;
-	gOutput[launchIndex.xy] = float4(col, 1.0);
+	output0[launchIndex.xy] = float4(col, 1.0);
 }
 
 
@@ -100,6 +113,54 @@ void rayGen2() {
 void miss(inout RayPayload payload) {
 
 	payload.color = float3(1.0, 1.0, 1.0);
+}
+
+[shader("closesthit")]
+void closesthit(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attribs) {
+
+	float hitT = RayTCurrent();
+	float3 rayDirW = WorldRayDirection();
+	float3 rayOriginW = WorldRayOrigin();
+
+	float3 posW = rayOriginW + hitT * rayDirW;
+
+	RayDesc ray;
+	ray.Origin = posW;
+	ray.Direction = normalize(float3(-lightDir.xyz));
+	ray.TMin = 0.01;
+	ray.TMax = 100000;
+
+	ShadowPayload shadowPayload;
+
+	TraceRay(gRtScene, 0, 0xFF, 1, 0, 1, ray, shadowPayload);
+
+	float shadowfactor = shadowPayload.hit ? 0.25 : 1.0;
+
+	uint tIndex = PrimitiveIndex();
+	int address = tIndex * 3 * 4;
+	uint3 indices = index[InstanceID()].Load3(address);
+
+	float3 barycentrics = float3(1.0 - attribs.barycentrics.x - attribs.barycentrics.y, attribs.barycentrics.x, attribs.barycentrics.y);
+
+	MaterialAttrs mattr = materialAttributes[InstanceID()];
+
+	if (mattr.texCount > 0) {
+		float2 texCoord = float2(0.0, 0.0);
+		for(uint i = 0; i < 3; ++i){
+			int vaddr = indices[i] * 4 * 4;
+			uint4 texc = texCoord0[InstanceID()].Load4(vaddr);
+			texCoord += asfloat(texc.xy) * barycentrics[i];
+		}
+		uint2 size;
+		tex[InstanceID()].GetDimensions(size.x, size.y);
+
+		payload.color = tex[InstanceID()][uint2(texCoord * size)] * shadowfactor;
+	}
+	else {
+		payload.color = shadowfactor;
+	}
+
+	
 }
 
 
@@ -115,7 +176,6 @@ void chit(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes att
 	float3 rayOriginW = WorldRayOrigin();
 
 	float3 posW = rayOriginW + hitT * rayDirW;
-
 	RayDesc ray;
 	ray.Origin = posW;
 	ray.Direction = normalize(float3(-lightDir.xyz));
@@ -134,14 +194,68 @@ void chit(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes att
 [shader("closesthit")]
 void chit2(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attribs) {
 
-	payload.color = float3(1.0, 0.0, 0.0);
+	float3 barycentrics = float3(1.0 - attribs.barycentrics.x - attribs.barycentrics.y, attribs.barycentrics.x, attribs.barycentrics.y);
+
+	float hitT = RayTCurrent();
+	float3 rayDirW = WorldRayDirection();
+	float3 rayOriginW = WorldRayOrigin();
+
+	float3 posW = rayOriginW + hitT * rayDirW;
+
+	RayDesc ray;
+	ray.Origin = posW;
+	ray.Direction = normalize(float3(-lightDir.xyz));
+	ray.TMin = 0.01;
+	ray.TMax = 100000;
+	
+	ShadowPayload shadowPayload;
+	
+	TraceRay(gRtScene, 0, 0xFF, 1, 0, 1, ray, shadowPayload);
+
+	float factor = shadowPayload.hit ? 0.25 : 1.0;
+	payload.color = float3(1.0, 0.0, 0.0) * factor;
+
+	uint tIndex = PrimitiveIndex();
+	int address = tIndex * 3 * 4;
+	uint3 indices = index[InstanceID()].Load3(address);
+
+	float2 texCoord = float2(0.0, 0.0);
+	for(uint i = 0; i < 3; ++i){
+		int vaddr = indices[i] * 4 * 4;
+		uint4 texc = texCoord0[InstanceID()].Load4(vaddr);
+		texCoord += asfloat(texc.xy) * barycentrics[i];
+	}
+
+	uint2 size;
+	tex[InstanceID()].GetDimensions(size.x, size.y);
+
+	MaterialAttrs mattr = materialAttributes[InstanceID()];
+
+	payload.color = tex[InstanceID()][uint2(texCoord * size)] * mattr.texCount;
 }
 
 
 [shader("closesthit")]
 void chit3(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attribs) {
 
-	payload.color = float3(0.5, 0.5, 0.5);
+	float hitT = RayTCurrent();
+	float3 rayDirW = WorldRayDirection();
+	float3 rayOriginW = WorldRayOrigin();
+
+	float3 posW = rayOriginW + hitT * rayDirW;
+
+	RayDesc ray;
+	ray.Origin = posW;
+	ray.Direction = normalize(float3(-lightDir.xyz));
+	ray.TMin = 0.01;
+	ray.TMax = 100000;
+	
+	ShadowPayload shadowPayload;
+	
+	TraceRay(gRtScene, 0, 0xFF, 1, 0, 1, ray, shadowPayload);
+
+	float factor = shadowPayload.hit ? 0.1 : 1.0;
+	payload.color = float3(0.5, 0.5, 0.5) * factor;
 }
 
 
@@ -150,13 +264,6 @@ void shadowahit(inout ShadowPayload payload, in BuiltInTriangleIntersectionAttri
 
 	payload.hit = true;
 }
-
-[shader("anyhit")]
-void shadowahit2(inout ShadowPayload payload, in BuiltInTriangleIntersectionAttributes attribs) {
-
-	payload.hit = true;
-}
-
 
 [shader("miss")]
 void shadowMiss(inout ShadowPayload payload) {

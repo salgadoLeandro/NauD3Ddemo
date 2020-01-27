@@ -1,0 +1,1 @@
+start ..\nauD3DDemod.exe .\tests\HR2\hybridrendering7_03.xml

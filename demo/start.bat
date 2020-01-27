@@ -1,1 +1,0 @@
-start .\nauD3DDemod.exe .\geometry\geometry2.hlsl.xml

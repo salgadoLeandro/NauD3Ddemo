@@ -1,0 +1,1 @@
+start .\nauD3DDemod.exe .\tests\RTR2\raytracedreflections8.xml

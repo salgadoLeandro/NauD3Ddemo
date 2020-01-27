@@ -1,0 +1,21 @@
+struct VS_INPUT {
+    float4 position : POSITION;
+    float4 texCoord : TEXCOORD0;
+};
+
+cbuffer ConstBuffer : register(b0) {
+    float4x4 m_pvm;
+};
+
+struct VS_OUTPUT {
+    float4 position : SV_POSITION;
+    float2 texCoord : TEXCOORD0;
+};
+
+VS_OUTPUT main (VS_INPUT input) {
+
+    VS_OUTPUT output;
+    output.position = mul(m_pvm, input.position);
+    output.texCoord = input.texCoord.xy;
+    return output;
+}
