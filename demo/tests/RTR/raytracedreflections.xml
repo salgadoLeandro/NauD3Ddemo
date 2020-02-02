@@ -20,9 +20,12 @@
             <camera name="MainCamera" >
 				<viewport name="MainViewport" />
 				<projection TYPE="PERSPECTIVE" FOV=60.0 NEAR=0.3 FAR=1000.0 />
-				<POSITION x="-40.593395" y="32.43354" z="-1.299236" />
+                <POSITION x="25.0" y="17.5" z="0.0" />
+				<VIEW x="1" y="0" z="-0.5" />
+				<UP x="0" y="1" z="0" />
+				<!--POSITION x="-40.593395" y="32.43354" z="-1.299236" />
 				<VIEW x="0.901307" y="-0.361665" z="-0.238421" /> 
-				<UP x="0.0" y="1.0" z="0.0" />
+				<UP x="0.0" y="1.0" z="0.0" /-->
 			</camera>
         </cameras>
 
