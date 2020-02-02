@@ -1,0 +1,42 @@
+<? xml version="1.0" ?>
+<materiallib name="Ray Traced Ambient Occlusion">
+    <renderTargets>
+        <renderTarget name="dxr">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <colors>
+                <color name="offscreenrenderDXR" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="gbuff">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <colors>
+                <color name="worldPosition" internalFormat="RGBA32F" />
+                <color name="worldNormal" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+    </renderTargets>
+
+    <shaders>
+        <shader name="gbuffer"      vs="shaders/gbuff.vert.hlsl"
+                                    ps="shaders/gbuff.frag.hlsl" />
+    </shaders>
+
+    <materials>
+        <material name="gbuffer">
+            <shader name="gbuffer">
+                <values>
+                    <valueof uniform="m_pvm"    block="Constants"
+                                                type="RENDERER" context="CURRENT"
+                                                component="PROJECTION_VIEW_MODEL" />
+                    <valueof uniform="m_model"  block="Constants"
+                                                type="RENDERER" context="CURRENT"
+                                                component="MODEL" />
+                    <valueof uniform="cameraPos"    block="Constants"
+                                                    type="CAMERA" context="CURRENT"
+                                                    component="POSITION" />
+                </values>
+            </shader>
+        </material>
+    </materials>
+</materiallib>

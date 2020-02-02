@@ -6,6 +6,8 @@
 
 'start_rtr_cornellbox_08.bat' runs a cornell box ray tracing demo.
 
+'start_all_tests' executes a script that will run all demos 5 times, and generate a profile for each execution in an 'output' folder. It must be executed in Administrator Mode.
+
 
 
 More test demos are included in the 'tests.bat' folder.

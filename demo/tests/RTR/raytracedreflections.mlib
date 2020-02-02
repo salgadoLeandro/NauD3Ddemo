@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<materiallib name="Ray Traced Reflections">
+    <renderTargets>
+        <renderTarget name="dxr">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <colors>
+                <color name="offscreenrenderDXR" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+    </renderTargets>
+</materiallib>
