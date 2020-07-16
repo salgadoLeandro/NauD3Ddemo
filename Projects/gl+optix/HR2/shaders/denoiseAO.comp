@@ -1,0 +1,57 @@
+#version 430
+
+layout (location = 0, r32f) uniform readonly image2D rtao;
+layout (location = 1, rgba32f) uniform readonly image2D positions;
+layout (location = 2, rgba32f) uniform image2D outp;
+
+uniform float maxDist = 2.0f;
+
+layout (local_size_x = 2, local_size_y = 2, local_size_z = 1) in;
+
+void main() {
+
+    ivec2 dtID = ivec2(gl_GlobalInvocationID);
+
+    ivec2 up = dtID + ivec2(0, 1);
+    ivec2 down = dtID + ivec2(0, -1);
+    ivec2 left = dtID + ivec2(-1, 0);
+    ivec2 right = dtID + ivec2(1, 0);
+    ivec2 upleft = dtID + ivec2(-1, 1);
+    ivec2 upright = dtID + ivec2(1, 1);
+    ivec2 downleft = dtID + ivec2(-1, -1);
+    ivec2 downright = dtID + ivec2(1, -1);
+
+    vec4 pc = imageLoad(positions, dtID);
+    vec4 pu = imageLoad(positions, up);
+    vec4 pd = imageLoad(positions, down);
+    vec4 pl = imageLoad(positions, left);
+    vec4 pr = imageLoad(positions, right);
+    vec4 pul = imageLoad(positions, upleft);
+    vec4 pur = imageLoad(positions, upright);
+    vec4 pdl = imageLoad(positions, downleft);
+    vec4 pdr = imageLoad(positions, downright);
+
+    float pud = length(pc - pu);
+    float pdd = length(pc - pd);
+    float pld = length(pc - pl);
+    float prd = length(pc - pr);
+    float puld = length(pc - pul);
+    float purd = length(pc - pur);
+    float pdld = length(pc - pdl);
+    float pdrd = length(pc - pdr);
+
+    float res = imageLoad(rtao, dtID).x;
+    int total = 1;
+
+    if (pud <= maxDist) { res += imageLoad(rtao, up).x; ++total; }
+    if (pdd <= maxDist) { res += imageLoad(rtao, down).x; ++total; }
+    if (pld <= maxDist) { res += imageLoad(rtao, left).x; ++total; }
+    if (prd <= maxDist) { res += imageLoad(rtao, right).x; ++total; }
+    if (puld <= maxDist) { res += imageLoad(rtao, upleft).x; ++total; }
+    if (purd <= maxDist) { res += imageLoad(rtao, upright).x; ++total; }
+    if (pdld <= maxDist) { res += imageLoad(rtao, downleft).x; ++total; }
+    if (pdrd <= maxDist) { res += imageLoad(rtao, downright).x; ++total; }
+
+    float rt = res / float(total);
+    imageStore(outp, dtID, vec4(rt, rt, rt, 1.0f));
+}

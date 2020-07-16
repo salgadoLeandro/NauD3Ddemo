@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<materiallib name="Hybrid Rendering">
+    <renderTargets>
+        <renderTarget name="gl">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <CLEAR_VALUES r=0.26 g=0.5 b=0.89 />
+            <colors>
+                <color name="offscreenrenderGL" internalFormat="RGBA32F" />
+                <color name="mask" internalFormat="RGBA32F" />
+                <color name="gPositions" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="optix">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <CLEAR_VALUES r="1.0" g="1.0" b="1.0" />
+            <colors>
+                <color name="offscreenrenderOptiX" internalFormat="RGBA32F" />
+                <color name="offscreenrenderRTAO" internalFormat="R32F" />
+                <color name="offscreenrenderRTS" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="denoised">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <CLEAR_VALUES r=0.26 g=0.5 b=0.89 />
+            <colors>
+                <color name="RTAOaccumulated" internalFormat="RGBA32F" />
+                <color name="RTAOdenoised" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+    </renderTargets>
+
+    <shaders>
+        <shader name="raster"       vs="shaders/raster.vert"
+                                    ps="shaders/raster.frag" />
+        <shader name="mask"         vs="shaders/raster.vert"
+                                    ps="shaders/mask.frag" />
+        <shader name="comp"         cs="shaders/comp.comp" />
+        <shader name="denoiseAO"    cs="shaders/denoiseAO.comp" />
+        <shader name="combine"      vs="shaders/combine.vert"
+                                    ps="shaders/combine.frag" />
+    </shaders>
+
+    <materials>
+        <material name="raster">
+            <shader name="raster">
+                <values>
+                    <valueof uniform="m_pvm"    type="RENDERER" context="CURRENT"
+                                                component="PROJECTION_VIEW_MODEL" />
+                    <valueof uniform="diffuse"  type="COLOR" context="CURRENT"
+                                                component="DIFFUSE" />
+                    <valueof uniform="texCount" type="RENDERER" context="CURRENT"
+                                                component="TEXTURE_COUNT" />
+                </values>
+            </shader>
+        </material>
+
+        <material name="mask">
+            <shader name="mask">
+                <values>
+                    <valueof uniform="m_pvm"    type="RENDERER" context="CURRENT"
+                                                component="PROJECTION_VIEW_MODEL" />
+                    <valueof uniform="diffuse"  type="COLOR" context="CURRENT"
+                                                component="DIFFUSE" />
+                    <valueof uniform="texCount" type="RENDERER" context="CURRENT"
+                                                component="TEXTURE_COUNT" />
+                </values>
+            </shader>
+        </material>
+
+        <material name="comp">
+            <shader name="comp">
+                <values>
+                    <valueof uniform="rtao"     type="IMAGE_TEXTURE" context="CURRENT"
+                                                id=0 component="UNIT" />
+                    <valueof uniform="outp"     type="IMAGE_TEXTURE" context="CURRENT"
+                                                id=1 component="UNIT" />
+                </values>
+            </shader>
+            <imageTextures>
+                <imageTexture UNIT=0 texture="offscreenrenderRTAO">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="RTAOaccumulated">
+                    <ACCESS value="READ_WRITE" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+        <material name="combineDenoise">
+            <shader name="combine">
+                <values>
+                    <valueof uniform="gl"   type="TEXTURE_BINDING" context="CURRENT"
+                                            component="UNIT" id=0 />
+                    <valueof uniform="mask" type="TEXTURE_BINDING" context="CURRENT"
+                                            component="UNIT" id=1 />
+                    <valueof uniform="optx" type="TEXTURE_BINDING" context="CURRENT"
+                                            component="UNIT" id=2 />
+                    <valueof uniform="rtao" type="TEXTURE_BINDING" context="CURRENT"
+                                            component="UNIT" id=3 />
+                    <valueof uniform="rts"  type="TEXTURE_BINDING" context="CURRENT"
+                                            component="UNIT" id=4 />
+                </values>
+            </shader>
+            <textures>
+                <texture UNIT=0 name="offscreenrenderGL">
+                    <MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+                    <MAG_FILTER value="NEAREST" />
+                    <WRAP_S value="CLAMP_TO_BORDER" />
+                    <WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+                <texture UNIT=1 name="mask">
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+                <texture UNIT=2 name="offscreenrenderOptiX">
+                    <MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+                    <MAG_FILTER value="NEAREST" />
+                    <WRAP_S value="CLAMP_TO_BORDER" />
+                    <WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+				<texture UNIT=3 name="RTAOaccumulated" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+				<texture UNIT=4 name="offscreenrenderRTS" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+            </textures>
+        </material>
+
+        <material name="denoiseAO">
+            <shader name="denoiseAO">
+                <values>
+                    <valueof uniform="rtao"         type="IMAGE_TEXTURE" context="CURRENT"
+                                                    id=0 component="UNIT" />
+                    <valueof uniform="positions"     type="IMAGE_TEXTURE" context="CURRENT"
+                                                    id=1 component="UNIT" />
+                    <valueof uniform="outp"         type="IMAGE_TEXTURE" context="CURRENT"
+                                                    id=2 component="UNIT" />    
+                </values>
+            </shader>
+            <imageTextures>
+                <imageTexture UNIT=0 texture="RTAOaccumulated">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="gPositions">
+                    <ACCESS value="READ_ONLY" />
+                </imageTexture>
+                <imageTexture UNIT=2 texture="RTAOdenoised">
+                    <ACCESS value="READ_WRITE" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+    </materials>
+</materiallib>

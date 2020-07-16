@@ -1,0 +1,1 @@
+start ..\nauD3DDemod.exe tests\RTS\raytracedshadows4.xml

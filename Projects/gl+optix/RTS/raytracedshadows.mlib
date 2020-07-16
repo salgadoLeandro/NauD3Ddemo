@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<materiallib name="Ray Traced Shadows">
+    <renderTargets>
+        <renderTarget name="optix">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <colors>
+                <color name="offscreenrenderOptix" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+    </renderTargets>
+</materiallib>

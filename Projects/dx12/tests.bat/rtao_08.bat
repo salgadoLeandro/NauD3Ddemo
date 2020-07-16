@@ -1,0 +1,1 @@
+start ..\nauD3DDemod.exe tests\RTAO\raytracedAO2.xml

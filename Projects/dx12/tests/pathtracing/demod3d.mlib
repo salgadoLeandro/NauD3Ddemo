@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<materiallib name="DemoD3D">
+    
+    <textures>
+        <texture name="Crate" filename="crate.jpg" mipmap=true />
+        <texture name="Earth" filename="earth.jpg" mipmap=true />
+    </textures>
+
+    <materials>
+        <material name="demoCaixa">
+            <textures>
+                <texture name="Crate" UNIT=0 />
+            </textures>
+        </material>
+        <material name="demoEsfera">
+            <textures>
+                <texture name="Earth" UNIT=0 />
+            </textures>
+        </material>
+    </materials>
+</materiallib>

@@ -1,0 +1,1 @@
+start ..\nauD3DDemod.exe tests\pathtracing\pathtracing.xml

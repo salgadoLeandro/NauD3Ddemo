@@ -1,0 +1,211 @@
+<?xml version="1.0" ?>
+<materiallib name="DXR Ray Tracer Render Target">
+    <renderTargets>
+        <renderTarget name="dxr">   
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <colors>
+                <color name="offscreenrenderDXR" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="d3d">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <colors>
+                <color name="offscreenrenderD3D" internalFormat="RGBA32F" />
+                <color name="offscreenrenderD3D2" internalFormat="RGBA" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="luminance">
+            <SIZE width="RTSIZE" height="RTSIZE" />
+            <LEVELS value=9 />
+            <colors>
+                <color name="luminance" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+
+        <renderTarget name="luminanceMip">
+            <SIZE width="HRTSIZE" height="HRTSIZE" />
+            <colors>
+                <color name="luminanceMip" internalFormat="RGBA32F" />
+            </colors>
+        </renderTarget>
+    </renderTargets>
+
+    <textures>
+		<texture name="dataBuffer">
+			<WIDTH value="2" />
+			<HEIGHT value="2" />
+			<INTERNAL_FORMAT value="RGBA32F" />
+		
+		</texture> 
+	</textures>
+	
+	<buffers>
+		<buffer name="test">
+			<DIM x=2 y=2 z=1 />
+			<structure>
+				<field value = "UINT" />
+			</structure>
+		</buffer>
+	</buffers>	
+
+	<states>
+		<state name ="Transparent">
+			<ORDER value="1" />
+			<BLEND_SRC value="SRC_ALPHA" />
+			<BLEND_DST value="ONE_MINUS_SRC_ALPHA" />
+		</state>
+	</states>
+
+    <shaders>
+        <shader name="pointLight"       vs="shaders/pointlight.vert.hlsl" 
+                                        ps="shaders/pointlight.frag.hlsl" />
+        <shader name="combine"          vs="shaders/combine.vert.hlsl"
+                                        ps="shaders/combine.frag.hlsl" />
+        <shader name="combineComp"      cs="shaders/combine.comp.hlsl" />
+        <shader name="computeLuminance" vs="shaders/combine.vert.hlsl"
+                                        ps="shaders/computeLuminance.frag.hlsl" />
+        <shader name="tonemap"          vs="shaders/combine.vert.hlsl"
+                                        ps="shaders/tonemap.frag.hlsl" />
+        <shader name="mipmap"           cs="shaders/mipmap.comp.hlsl" />
+    </shaders>
+
+    <materials>
+        <material name="pointLight">
+            <shader name="pointLight">
+                <values>
+                    <valueof uniform="lightPos"     block="plCBvaluesV"
+                                                    type="LIGHT" context="CURRENT"
+                                                    id=0 component="POSITION" />
+
+                    <valueof uniform="diffuse"      block="plCBvaluesF"
+                                                    type="COLOR" context="CURRENT"
+                                                    component="DIFFUSE" />
+
+                    <valueof uniform="specular"     block="plCBvaluesF"
+                                                    type="COLOR" context="CURRENT"
+                                                    component="SPECULAR" />
+                    
+                    <valueof uniform="shininess"    block="plCBvaluesF"
+                                                    type="COLOR" context="CURRENT"
+                                                    component="SHININESS" />
+
+                    <valueof uniform="emission"     block="plCBvaluesF"
+                                                    type="COLOR" context="CURRENT"
+                                                    component="EMISSION" />
+                    
+                    <valueof uniform="ambient"      block="plCBvaluesF"
+                                                    type="COLOR" context="CURRENT"
+                                                    component="AMBIENT" />
+
+                    <valueof uniform="PVM"          block="plCBvaluesV"
+                                                    type="RENDERER" context="CURRENT"
+                                                    component="PROJECTION_VIEW_MODEL" />
+
+                    <valueof uniform="VM"           block="plCBvaluesV"
+                                                    type="RENDERER" context="CURRENT"
+                                                    component="VIEW_MODEL" />
+
+                    <valueof uniform="normalMatrix" block="plCBvaluesV"
+                                                    type="RENDERER" context="CURRENT"
+                                                    component="NORMAL" />
+
+                    <valueof uniform="texCount"     block="plCBvaluesF"
+                                                    type="RENDERER" context="CURRENT"
+                                                    component="TEXTURE_COUNT" />
+
+                    <valueof uniform="texUnit"      type="TEXTURE_BINDING" context="CURRENT"
+                                                    component="UNIT" id="0" />
+                </values>
+            </shader>
+        </material>
+
+        <material name="combine">
+            <shader name="combine"/>
+            <textures>
+                <texture name="offscreenrenderDXR" UNIT=0 />
+            </textures>
+            <imageTextures>
+                <imageTexture UNIT=1 texture="offscreenrenderD3D">
+                    <ACCESS value="READ_WRITE" />
+                    <LEVEL value=0 />
+                    <CLEAR value="false" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+        <material name="combineComp">
+            <shader name="combineComp">
+                <values>
+                    <valueof uniform="frameCount"       block="cpCBvalues"
+                                                        type="RENDERER" context="CURRENT"
+                                                        component="FRAME_COUNT" />
+                </values>
+            </shader>
+            <imageTextures>
+                <imageTexture UNIT=0 texture="offscreenrenderD3D">
+                    <ACCESS value="READ_WRITE" />
+                    <LEVEL value=0 />
+                    <CLEAR value="false" />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="offscreenrenderDXR">
+                    <ACCESS value="READ_WRITE" />
+                    <LEVEL value=0 />
+                    <CLEAR value="false" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+        <material name="computeLuminance">
+            <shader name="computeLuminance" />
+            <textures>
+                <texture name="offscreenrenderD3D" UNIT=0 />
+            </textures>
+        </material>
+
+        <material name="mipmap">
+            <shader name="mipmap">
+                <values>
+                    <valueof uniform="destMipLevel" block="mmCBvalues"
+                                                    type="PASS" context="CURRENT"
+                                                    component="CurrentLevel" />
+                </values>
+            </shader>
+            <imageTextures>
+                <imageTexture UNIT=0 texture="luminance">
+                    <ACCESS value="READ_ONLY"/>
+                    <LEVEL value=0 />
+                </imageTexture>
+                <imageTexture UNIT=1 texture="luminanceMip">
+                    <ACCESS value="WRITE_ONLY" />
+                </imageTexture>
+            </imageTextures>
+        </material>
+
+        <material name="tonemap">
+            <shader name="tonemap"/>
+            <textures>
+                <texture UNIT=0 name="offscreenrenderD3D" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+                <texture UNIT=1 name="luminance">
+                    <MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+                    <MAG_FILTER value="NEAREST" />
+                    <WRAP_S value="CLAMP_TO_BORDER" />
+                    <WRAP_T value="CLAMP_TO_BORDER" />
+                </texture>
+				<texture UNIT=2 name="luminanceMip" >
+					<MIN_FILTER value="NEAREST_MIPMAP_NEAREST" />
+					<MAG_FILTER value="NEAREST" />
+					<WRAP_S value="CLAMP_TO_BORDER" />
+					<WRAP_T value="CLAMP_TO_BORDER" />
+				</texture>
+            </textures>
+        </material>
+    </materials>
+
+</materiallib>

@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<project name="DemoRTR" width=512 height=512>
+    <assets>
+        <constants>
+            <constant name="RTSIZE" value=512 />
+        </constants>
+
+        <scenes>
+            <scene name="MainScene">
+                <file name="../../Models/LargoCamoes/largoCamoes.nbo" />
+            </scene>
+        </scenes>
+
+        <viewports>
+            <viewport name="MainViewport">
+                <CLEAR_COLOR r="1.0" g="1.0" b="1.0" />
+            </viewport>
+        </viewports>
+
+        <cameras>
+            <camera name="MainCamera" >
+				<viewport name="MainViewport" />
+				<projection TYPE="PERSPECTIVE" FOV=60.0 NEAR=0.3 FAR=1000.0 />
+                <POSITION x="25.0" y="17.5" z="0.0" />
+				<VIEW x="1" y="0" z="-0.5" />
+				<UP x="0" y="1" z="0" />
+			</camera>
+        </cameras>
+
+        <lights>
+            <light name="Sun" >
+				<POSITION x="-52" y="77.0" z="-27.0" />
+				<DIRECTION x="0.597" y="-0.390" z="0.700" />
+				<COLOR r="0.9" g="0.9" b="0.9" />
+				<AMBIENT r="0.5" g="0.5" b="0.5" />
+			</light>
+        </lights>
+
+        <materialLibs>
+            <materialLib filename="raytracedreflections.mlib" />
+        </materialLibs>
+    </assets>
+
+    <pipelines>
+        <pipeline name="RTReflections" default="true" defaultCamera="MainCamera">
+            <pass class="optix" name="RTReflections">
+                <scenes>
+                    <scene name="MainScene" />
+                </scenes>
+                <camera name="MainCamera" />
+                <renderTarget name="optix" fromLibrary="Ray Traced Reflections" />
+                <lights>
+                    <light name="Sun" />
+                </lights>
+                <optixEntryPoint>
+                    <optixProgram type="RayGen" file="shaders/shader.ptx" proc="raygen"/>
+                    <optixProgram type="Exception" file="shaders/shader.ptx" proc="exception" />
+                </optixEntryPoint>
+                <optixDefaultMaterial>
+                    <optixProgram type="Closest_Hit" ray="Phong" file="shaders/shader.ptx" proc="tracePath"/> 
+					<optixProgram type="Miss" 		 ray="Phong" file="shaders/shader.ptx" proc="miss"/>
+                    <optixProgram type="Miss"        ray="Shadow" file="shaders/shader.ptx" proc="missShadow" />
+                    <optixProgram type="Any_Hit"     ray="Shadow" file="shaders/shader.ptx" proc="any_hit_shadow" />
+                </optixDefaultMaterial>
+                <optixMaterialMap>
+                    <optixMap to="__nau_material_lib:Vidro">
+                        <optixProgram type="Closest_Hit" ray="Phong" file="shaders/shader.ptx" proc="traceGlass" />
+                        <optixProgram type="Any_Hit" ray="Shadow" file="shaders/shader.ptx" proc="keepGoingShadow" />
+                    </optixMap>
+				</optixMaterialMap>
+				<optixVertexAttributes>
+					<attribute name="position"/>
+					<attribute name="normal"/>
+					<attribute name="texCoord0"/>
+				</optixVertexAttributes>
+                <optixGeometryProgram>
+                    <optixProgram type="Geometry_Intersection" file="shaders/shader.ptx" proc="geometryintersection" />
+                    <optixProgram type="Bounding_Box" file="shaders/shader.ptx" proc="boundingbox" />
+                </optixGeometryProgram>
+				<optixMaterialAttributes>
+					<valueof optixVar="diffuse" type="COLOR" context="CURRENT" component="DIFFUSE" />
+					<valueof optixVar="texCount" type="RENDERER" context="CURRENT" component="TEXTURE_COUNT" />
+				</optixMaterialAttributes>
+				<optixGlobalAttributes>
+					<valueof optixVar="lightDir" type="LIGHT" context="CURRENT" id=0 component="DIRECTION" />
+					<valueof optixVar="lightPos" type="LIGHT" context="CURRENT" id=0 component="POSITION" />
+					<valueof optixVar="frameCount" type="RENDERER" context="CURRENT" component="FRAME_COUNT" />
+				</optixGlobalAttributes>
+            </pass>
+            <pass class="quad" name="pass2">
+                <viewport name="MainViewport" />
+                <texture name="offscreenrenderOptix" fromLibrary="Ray Traced Reflections" />
+            </pass>
+        </pipeline>
+    </pipelines>
+</project>
